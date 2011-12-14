@@ -1,0 +1,43 @@
+################################################################################
+#  Copyright 2010-2011 CloudBees Inc.
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+################################################################################
+# To call this script: 
+# curl -s https://repository-cloudbees.forge.cloudbees.com/distributions/ci-addons/rvm/install-addon | bash
+# rvm reload
+# rvm use 1.9.2
+
+set -eu
+
+if [ "${WORKSPACE:-notset}" == "notset" ]; then
+  echo '$WORKSPACE is not set'
+  exit 1
+fi
+
+#curl -ks https://rvm.beginrescueend.com/install/rvm -o rvm-installer
+curl -ks 'https://raw.github.com/fishnix/rvm/master/binscripts/rvm-installer' -o rvm-installer
+chmod +x rvm-installer
+# To make matrix builds work, we need to hardwire the workspace
+RVM_HOME=${WORKSPACE}
+echo Installing RVM into ${RVM_HOME}
+rvm_path=${RVM_HOME} rvm_prefix=${RVM_HOME} ./rvm-installer --branch fishnix/master
+
+# This file isn't persisted between executors; so we need to recreate it
+echo "rvm_install_on_use_flag=1" >  ~/.rvmrc
+echo 'rvm_make_flags="-j 3"'     >> ~/.rvmrc
+echo "rvm_path=${RVM_HOME}"      >> ~/.rvmrc
+
+# If you want to prebuild a Ruby version - do it after this script has completed
+
+echo Please run "rvm reload" after this add-on finishes running
