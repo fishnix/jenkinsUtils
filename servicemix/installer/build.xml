@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jenkins-servicemix">
+	<defaultexcludes add="**/.svn"/>
+	<defaultexcludes add="**/.svn/**"/>
+
+	<target name="create-child">
+  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:create testchild" />
+	</target>
+	
+	<target name="start-child">
+  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:start testchild" />
+	</target>
+	
+	<target name="stop-child">
+  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:stop testchild" />
+	</target>
+	
+	<target name="destroy-child">
+  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:destroy testchild" />
+	</target>
+	
+	<target name="list-children">
+  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:list" />
+	</target>
+	
+</project>  
