@@ -9,7 +9,7 @@
     Set some sane defaults - all overridable.
   -->
   <property name="karaf.remote.host" value="127.0.0.1" />
-  <property name="karaf.remote.port" value="8099" />
+  <property name="karaf.remote.port" value="8101" />
   <property name="karaf.remote.user" value="smx" />
   <property name="karaf.remote.pass" value="smx" />
   <property name="karaf.remote.cmd" value="admin:list" />
