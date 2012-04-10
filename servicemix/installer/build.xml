@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="jenkins-servicemix">
-	<defaultexcludes add="**/.svn"/>
-	<defaultexcludes add="**/.svn/**"/>
-	<defaultexcludes add="**/.git"/>
-	<defaultexcludes add="**/.git/**"/>
+  <defaultexcludes add="**/.svn"/>
+  <defaultexcludes add="**/.svn/**"/>
+  <defaultexcludes add="**/.git"/>
+  <defaultexcludes add="**/.git/**"/>
 
-	<!--
-		Set some sane defaults - all overridable.
-	-->
-	<property name="karaf.remote.host" value="127.0.0.1" />
-	<property name="karaf.remote.port" value="8099" />
-	<property name="karaf.remote.user" value="smx" />
-	<property name="karaf.remote.pass" value="smx" />
-	<property name="karaf.remote.cmd" value="admin:list" />
-	
-	<!--
-		Define a macro to sshexec, we might need to do
-		this a little different if we want output
-	-->
-	<macrodef name="karaf-remote-exec">
-		<attribute name="karaf-command" />
-		<sequential>
-			<sshexec outputproperty="karaf.remote.output" trust="yes" failonerror="true" 
-								host="${karaf.remote.host}" port="${karaf.remote.port}" 
-								username="${karaf.remote.user}" password="${karaf.remote.pass}" 
-								command="@{karaf-command}" />
-  	</sequential>
-	</macrodef>
+  <!--
+    Set some sane defaults - all overridable.
+  -->
+  <property name="karaf.remote.host" value="127.0.0.1" />
+  <property name="karaf.remote.port" value="8099" />
+  <property name="karaf.remote.user" value="smx" />
+  <property name="karaf.remote.pass" value="smx" />
+  <property name="karaf.remote.cmd" value="admin:list" />
+  
+  <!--
+    Define a macro to sshexec, we might need to do
+    this a little different if we want output
+  -->
+  <macrodef name="karaf-remote-exec">
+    <attribute name="karaf-command" />
+    <sequential>
+      <sshexec outputproperty="karaf.remote.output" trust="yes" failonerror="true" 
+                host="${karaf.remote.host}" port="${karaf.remote.port}" 
+                username="${karaf.remote.user}" password="${karaf.remote.pass}" 
+                command="@{karaf-command}" />
+    </sequential>
+  </macrodef>
 
-	<target name="call-karaf-remote-exec">
-		<karaf-remote-exec karaf-command="${karaf.remote.cmd}" />
-		<echo message="${karaf.remote.output}" />
-	</target>
-	
+  <target name="call-karaf-remote-exec">
+    <karaf-remote-exec karaf-command="${karaf.remote.cmd}" />
+    <echo message="${karaf.remote.output}" />
+  </target>
+  
 </project>  
