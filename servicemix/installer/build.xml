@@ -2,25 +2,25 @@
 <project name="jenkins-servicemix">
 	<defaultexcludes add="**/.svn"/>
 	<defaultexcludes add="**/.svn/**"/>
+	<defaultexcludes add="**/.git"/>
+	<defaultexcludes add="**/.git/**"/>
 
-	<target name="create-child">
-  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:create testchild" />
-	</target>
+	<property name="karaf.remote.host" value="127.0.0.1" />
+	<property name="karaf.remote.port" value="8099" />
+	<property name="karaf.remote.user" value="smx" />
+	<property name="karaf.remote.pass" value="smx" />
+	<property name="karaf.remote.cmd" value="admin:list" />
 	
-	<target name="start-child">
-  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:start testchild" />
-	</target>
 	
-	<target name="stop-child">
-  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:stop testchild" />
-	</target>
-	
-	<target name="destroy-child">
-  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:destroy testchild" />
-	</target>
-	
-	<target name="list-children">
-  	<sshexec trust="yes" host="127.0.0.1" port="8099" username="smx" password="smx" command="admin:list" />
+	<macrodef name="karaf-remote-exec">
+		<attribute name="karaf-command" />
+		<sequential>
+			<sshexec trust="yes" failonerror="true" host="${karaf.remote.host}" port="${karaf.remote.port}" username="${karaf.remote.user}" password="${karaf.remote.pass}" command="@{karaf-command}" />
+  	</sequential>
+	</macrodef>
+
+	<target name="call-karaf-remote-exec">
+		<karaf-remote-exec karaf-command="${karaf.remote.cmd}" />
 	</target>
 	
 </project>  
