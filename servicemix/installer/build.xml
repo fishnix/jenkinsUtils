@@ -12,25 +12,98 @@
   <property name="karaf.remote.port" value="8101" />
   <property name="karaf.remote.user" value="smx" />
   <property name="karaf.remote.pass" value="smx" />
-  <property name="karaf.remote.cmd" value="admin:list" />
+  <property name="karaf.remote.cmd"  value="admin:list" />
   
   <!--
-    Define a macro to sshexec, we might need to do
-    this a little different if we want output
+    Define a macro to sshexec against a karaf instance
+    Attributes:
+      karaf-remote-host: remote host to connect to
+      karaf-remote-port: remote port to connect to
+      karaf-command: command to run via ssh
+      karaf-remote-exec-output: property containing file for output
   -->
   <macrodef name="karaf-remote-exec">
     <attribute name="karaf-command" />
+    <attribute name="karaf-remote-exec-output" />
+    <attribute name="karaf-remote-host" />
+    <attribute name="karaf-remote-port" />
     <sequential>
-      <sshexec outputproperty="karaf.remote.output" trust="yes" failonerror="true" 
-                host="${karaf.remote.host}" port="${karaf.remote.port}" 
+      <sshexec output="@{karaf-remote-exec-output}" trust="yes" failonerror="true" 
+                host="@{karaf-remote-host}" port="@{karaf-remote-port}" 
                 username="${karaf.remote.user}" password="${karaf.remote.pass}" 
                 command="@{karaf-command}" />
     </sequential>
   </macrodef>
 
+  <!--
+    Generic ask to make a call to karaf, you provide the command in karaf.remote.cmd
+  -->
   <target name="call-karaf-remote-exec">
-    <karaf-remote-exec karaf-command="${karaf.remote.cmd}" />
-    <echo message="${karaf.remote.output}" />
+    <tempfile property="call-karaf-remote-exec.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="${karaf.remote.cmd}" karaf-remote-exec-output="${call-karaf-remote-exec.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+  </target>
+
+  <!--
+    Specific task to return the list of children
+  -->
+  <target name="list-children">
+    <tempfile property="list-children.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="admin:list" karaf-remote-exec-output="${list-children.tempfile}" 
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+    <loadfile srcfile="${list-children.tempfile}" property="list-children.output">
+      <filterchain>
+        <tabstospaces tablength="1"/>
+        <linecontainsregexp negate="true">
+          <regexp pattern="SSH\s+Port\s+RMI\s+Ports\s+State\s+Pid\s+Name"/>
+        </linecontainsregexp>
+          <replaceregex pattern="^\s*\[.*\]\s*(\w+)$" replace="\1" />
+      </filterchain>
+    </loadfile>
+    <fail message="Cound not list children." unless="list-children.output" />
+    <echo message="${list-children.output}" />
+  </target>
+  
+  <!--
+    Specific task to return the ssh port of an instance by name
+  -->
+  <target name="get-ssh-port-by-name">
+    <fail message="Please provide the chile.name." unless="child.name" />
+    <tempfile property="get-child-ssh-port.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="admin:list" karaf-remote-exec-output="${get-child-ssh-port.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+    <loadfile srcfile="${get-child-ssh-port.tempfile}" property="get-child-ssh-port.output">
+      <filterchain>
+        <tabstospaces tablength="1"/>
+        <linecontainsregexp>
+          <regexp pattern="${child.name}\s*$"/>
+        </linecontainsregexp>
+        <replaceregex pattern="^\s*\[\s*(\d+)\].*$" replace="\1" />
+      </filterchain>
+    </loadfile>
+    <fail message="Cound not find ssh port for ${child.name}" unless="get-child-ssh-port.output" />
+    <echo message="Found ssh port for ${child.name}: ${get-child-ssh-port.output}" />
+  </target>
+  
+  <!--
+    Specific task to return the status of an instance by name
+  -->
+  <target name="get-status-by-name">
+    <fail message="Please provide the chile.name." unless="child.name" />
+    <tempfile property="get-status-by-name.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="admin:list" karaf-remote-exec-output="${get-status-by-name.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+    <loadfile srcfile="${get-status-by-name.tempfile}" property="get-status-by-name.output">
+      <filterchain>
+        <tabstospaces tablength="1"/>
+        <linecontainsregexp>
+          <regexp pattern="${child.name}\s*$"/>
+        </linecontainsregexp>
+        <replaceregex pattern="^.*\[\s*(Started|Starting|Stopped|Error)\s*\].*$" replace="\1" />
+      </filterchain>
+    </loadfile>
+    <fail message="Cound not find status for ${child.name}" unless="get-status-by-name.output" />
+    <echo message="Found status for ${child.name}: ${get-status-by-name.output}" />
   </target>
   
 </project>  
