@@ -36,13 +36,51 @@
   </macrodef>
 
   <!--
-    Generic ask to make a call to karaf, you provide the command in karaf.remote.cmd
+    Generic task to make a call to karaf, you provide the command in karaf.remote.cmd
   -->
   <target name="call-karaf-remote-exec">
     <tempfile property="call-karaf-remote-exec.tempfile" deleteonexit="true" createfile="true" />
     <karaf-remote-exec  karaf-command="${karaf.remote.cmd}" karaf-remote-exec-output="${call-karaf-remote-exec.tempfile}"
                         karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
   </target>
+
+  <!--
+    Create a child instance, you supply the name in create.child.name
+  -->
+  <target name="create-child">
+    
+    <property name="create.child.remote.cmd" value="admin:create ${create.child.name}" />
+    
+    <tempfile property="create-child.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="${create.child.remote.cmd}" karaf-remote-exec-output="${create-child.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+    <loadfile srcfile="${create-children.tempfile}" property="create-children.output">
+    </loadfile>
+    <fail message="Cound not list children." unless="create-child.output" />
+    <echo message="${list-children.output}" />
+  </target>
+  
+  <!--
+    Create a child instance with features file, you supply the name in create.child.name
+    and the create.child.feature.file.
+    
+    Not yet implemented
+    
+  <target name="create-child">
+  
+    <property name="create.child.features.remote.cmd" value="admin:create ${create.child.name} -f ${create.child.features.file}" />
+  
+    <tempfile property="create-child.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="${create.child.features.remote.cmd}" karaf-remote-exec-output="${create-child.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+    <loadfile srcfile="${create-children.tempfile}" property="create-children.output">
+    </loadfile>
+    <fail message="Cound not list children." unless="create-child.output" />
+    <echo message="${list-children.output}" />
+  </target>
+  -->
+  
+  
 
   <!--
     Specific task to return the list of children
