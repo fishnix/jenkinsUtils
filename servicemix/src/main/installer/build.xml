@@ -68,7 +68,7 @@
   -->
   <target name="create-child-features">
   
-    <property name="create.child.features.remote.cmd" value="admin:create ${create.child.name} --featureURL ${create.child.features.url}" />
+    <property name="create.child.features.remote.cmd" value="admin:create --featureURL ${create.child.feature.url} -f ${create.child.feature.name} ${create.child.name}" />
   
     <tempfile property="create-child.tempfile" deleteonexit="true" createfile="true" />
 
