@@ -20,7 +20,9 @@
   <feature name='yale-master' version="1.0.0">
       <!-- Add ESB parts you need here: -->
       <feature>nmr</feature>
+      <feature>camel</feature>
       <!-- Add Yale Features here: -->
+      <bundle>file:/Volumes/mfp/Users/fish/tmp/esb/Luther-1.0.0-SNAPSHOT.jar</bundle>
   </feature>
 
 

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>edu.yale.its</groupId>
+    <artifactId>yale-master-feature</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>yale-master-feature feature</name>
+    <description>
+        Create a feature with the defined dependencies set.
+    </description>
+    
+    <distributionManagement>
+      <repository>
+        <id>internal.repo</id>
+        <name>Yale Artifactory</name>
+        <url>dav:https://repository.its.yale.edu/maven2/libs-releases-local</url>
+      </repository>
+      <snapshotRepository>
+        <id>internal.repo.snapshots</id>
+        <name>Yale Artifactory</name>
+        <url>dav:https://repository.its.yale.edu/maven2/libs-snapshots-local</url>
+      </snapshotRepository>
+    </distributionManagement>
+    
+    <repositories>  
+       <repository>
+          <id>fuse.repo</id>
+          <url>http://repo.fusesource.com/nexus/content/groups/public/</url>
+          <releases>
+             <enabled>true</enabled>
+          </releases>
+          <snapshots>
+             <enabled>false</enabled>
+          </snapshots>
+       </repository>
+       
+       <repository>
+          <id>yale.repo</id>
+          <url>https://repository.its.yale.edu/maven2/repo/</url>
+          <releases>
+             <enabled>true</enabled>
+          </releases>
+          <snapshots>
+             <enabled>true</enabled>
+          </snapshots>
+       </repository>
+       
+       <repository>
+          <id>codehaus</id>
+          <name>Maven Codehaus repository</name>
+          <url>http://repository.codehaus.org/</url>
+       </repository>
+
+    </repositories>
+    
+    <pluginRepositories>
+       <pluginRepository>
+          <id>internal.repo</id>
+          <url>https://repository.its.yale.edu/maven2/repo</url>
+          <releases>
+             <enabled>true</enabled>
+          </releases>
+          <snapshots>
+             <enabled>true</enabled>
+          </snapshots>
+       </pluginRepository>
+    </pluginRepositories>
+    
+    <dependencies>
+      <!-- Put here the artifacts which should be included in the feature -->
+      <dependency>
+        <groupId>org.apache.servicemix.nmr</groupId>
+        <artifactId>apache-servicemix-nmr</artifactId>
+        <version>1.5.1-fuse-03-06</version>
+        <type>xml</type>
+        <classifier>features</classifier>
+      </dependency>
+        
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.karaf.tooling</groupId>
+              <artifactId>features-maven-plugin</artifactId>
+              <version>2.2.5</version>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+        
+        <plugins>
+            <plugin>
+                <groupId>org.apache.karaf.tooling</groupId>
+                <artifactId>features-maven-plugin</artifactId>
+                <version>2.2.5</version>
+                <executions>
+                    <execution>
+                        <id>generate-features-xml</id>
+                        <goals>
+                            <goal>generate-features-xml</goal>
+                        </goals>
+                        <configuration>
+                            <karafVersion>2.2.5</karafVersion>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
