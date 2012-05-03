@@ -44,10 +44,14 @@
                         karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
   </target>
 
+  <target name="check-child-name">
+    <fail message="Please provide the chile.name." unless="child.name" />
+  </target>
+
   <!--
     Create a child instance, you supply the name in create.child.name
   -->
-  <target name="create-child">
+  <target name="create-child" depends="check-child-name">
     
     <property name="create.child.remote.cmd" value="admin:create ${create.child.name}" />
     
@@ -60,28 +64,6 @@
     <echo message="${list-children.output}" />
     
   </target>
-  
-  <!--
-    Create a child instance with features file, you supply the name in create.child.name
-    and the create.child.feature.file.
-    
-  -->
-  <target name="create-child-features">
-  
-    <property name="create.child.features.remote.cmd" value="admin:create --featureURL ${create.child.feature.url} -f ${create.child.feature.name} ${create.child.name}" />
-  
-    <tempfile property="create-child.tempfile" deleteonexit="true" createfile="true" />
-
-    <karaf-remote-exec  karaf-command="${create.child.features.remote.cmd}" karaf-remote-exec-output="${create-child.tempfile}"
-                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
-
-    <loadfile srcfile="${create-children.tempfile}" property="create-children.output" />
-
-    <fail message="Failed to create child with command: ${create.child.features.remote.cmd} ." unless="create-child.output" />
-    <echo message="${list-children.output}" />
-
-  </target>
-  
   
 
   <!--
@@ -111,9 +93,8 @@
   <!--
     Specific task to return the ssh port of an instance by name
   -->
-  <target name="get-ssh-port-by-name">
+  <target name="get-ssh-port-by-name" depends="check-child-name">
     
-    <fail message="Please provide the chile.name." unless="child.name" />
     <tempfile property="get-child-ssh-port.tempfile" deleteonexit="true" createfile="true" />
 
     <karaf-remote-exec  karaf-command="admin:list" karaf-remote-exec-output="${get-child-ssh-port.tempfile}"
@@ -137,9 +118,8 @@
   <!--
     Specific task to return the status of an instance by name
   -->
-  <target name="get-status-by-name">
+  <target name="get-status-by-name" depends="check-child-name">
     
-    <fail message="Please provide the chile.name." unless="child.name" />
     <tempfile property="get-status-by-name.tempfile" deleteonexit="true" createfile="true" />
 
     <karaf-remote-exec  karaf-command="admin:list" karaf-remote-exec-output="${get-status-by-name.tempfile}"
@@ -159,5 +139,35 @@
     <echo message="Found status for ${child.name}: ${get-status-by-name.output}" />
     
   </target>
+  
+  <target name="add-features-url">
+    
+    <property name="add.features.url.remote.cmd" value="features:addurl ${features.url}" />
+    
+    <tempfile property="add-features-url.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="${add.features.url.remote.cmd}" karaf-remote-exec-output="${add-features-url.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+                        
+    <loadfile srcfile="${add-features-url.tempfile}" property="add-features-url.output" />
+
+    <echo message="${add-features-url.output}" />
+    
+  </target>
+  
+  <target name="list-features-url">
+    
+    <property name="list.features.url.remote.cmd" value="features:listurl" />
+    
+    <tempfile property="list-features-url.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="${add.features.url.remote.cmd}" karaf-remote-exec-output="${list-features-url.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+                        
+    <loadfile srcfile="${list-features-url.tempfile}" property="list-features-url.output" />
+
+    <fail message="Cound not list features urls." unless="list-features-url.output" />
+    <echo message="${list-features-url.output}" />
+    
+  </target>
+  
   
 </project>  
