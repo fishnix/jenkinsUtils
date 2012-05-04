@@ -117,6 +117,7 @@
   
   <!--
     Specific task to return the status of an instance by name
+    Optionally set boolean.status=true to fail unless the status is "Started"
   -->
   <target name="get-status-by-name" depends="check-child-name">
     
@@ -136,11 +137,35 @@
     </loadfile>
     
     <fail message="Cound not find status for ${child.name}" unless="get-status-by-name.output" />
+    <fail>
+      <condition>
+        <and>
+          <isset property="boolean.status" />
+          <not>
+            <equals arg1="Started" arg2="${get-status-by-name.output}" trim="true" />
+          </not>
+        </and>
+      </condition>
+    </fail>
     <echo message="Found status for ${child.name}: ${get-status-by-name.output}" />
     
   </target>
   
-  <target name="add-features-url">
+  <!-- 
+       =========================
+       Start features management
+       =========================
+   -->
+  
+  <target name="check-features-url">
+    <fail message="Features url not set." unless="features.url" />
+  </target>
+  
+  <target name="check-features-name">
+    <fail message="Features name not set." unless="features.name" />
+  </target>
+  
+  <target name="add-features-url" depends="check-features-url">
     
     <property name="add.features.url.remote.cmd" value="features:addurl ${features.url}" />
     
@@ -159,13 +184,94 @@
     <property name="list.features.url.remote.cmd" value="features:listurl" />
     
     <tempfile property="list-features-url.tempfile" deleteonexit="true" createfile="true" />
-    <karaf-remote-exec  karaf-command="${add.features.url.remote.cmd}" karaf-remote-exec-output="${list-features-url.tempfile}"
+    <karaf-remote-exec  karaf-command="${list.features.url.remote.cmd}" karaf-remote-exec-output="${list-features-url.tempfile}"
                         karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
                         
     <loadfile srcfile="${list-features-url.tempfile}" property="list-features-url.output" />
 
     <fail message="Cound not list features urls." unless="list-features-url.output" />
     <echo message="${list-features-url.output}" />
+    
+  </target>
+  
+  
+  <target name="refresh-features-urls">
+    
+    <property name="refresh.features.urls.remote.cmd" value="features:refreshUrl" />
+    
+    <tempfile property="refresh-features-urls.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="${refresh.features.urls.remote.cmd}" karaf-remote-exec-output="${refresh-features-urls.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+                        
+    <loadfile srcfile="${refresh-features-urls.tempfile}" property="refresh-features-urls.output" />
+
+    <echo message="${refresh-features-urls.output}" />
+    
+  </target>
+  
+  <target name="refresh-features-url" depends="check-features-url">
+    
+    <property name="refresh.features.url.remote.cmd" value="features:refreshUrl ${features.url}" />
+    
+    <tempfile property="refresh-features-url.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-remote-exec  karaf-command="${refresh.features.url.remote.cmd}" karaf-remote-exec-output="${refresh-features-url.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+                        
+    <loadfile srcfile="${refresh-features-url.tempfile}" property="refresh-features-url.output" />
+
+    <fail message="Cound not refresh features url." unless="refresh-features-url.output" />
+    <echo message="${refresh-features-url.output}" />
+    
+  </target>
+  
+  
+  <target name="install-features"  depends="check-features-name">
+    
+    <property name="install.features.remote.cmd" value="features:install ${features.name}" />
+    
+    <tempfile property="install-features.tempfile" deleteonexit="true" createfile="true" />
+    
+    <karaf-remote-exec  karaf-command="${install.features.remote.cmd}" karaf-remote-exec-output="${install-features.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+                        
+    <loadfile srcfile="${install-features.tempfile}" property="install-features.output" />
+
+    <fail message="Cound not install features." unless="install-features.output" />
+    <echo message="${install-features.output}" />
+    
+  </target>
+  
+  <!--
+    Specific task to return the status of a feature by name
+    Optionally set boolean.status=true to fail unless the status is "installed"
+  -->
+  <target name="get-features-status-by-name" depends="check-features-name">
+    
+    <tempfile property="get-features-status-by-name.tempfile" deleteonexit="true" createfile="true" />
+
+    <karaf-remote-exec  karaf-command="features:list" karaf-remote-exec-output="${get-features-status-by-name.tempfile}"
+                        karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
+
+    <loadfile srcfile="${get-features-status-by-name.tempfile}" property="get-features-status-by-name.output">
+      <filterchain>
+        <tabstospaces tablength="1"/>
+        <linecontainsregexp>
+          <regexp pattern="\s+${features.name}\s+"/>
+        </linecontainsregexp>
+        <replaceregex pattern="^\[\s*(uninstalled|installed)\s*\].*$" replace="\1" />
+      </filterchain>
+    </loadfile>
+    
+    <fail message="Cound not find status for ${features.name}" unless="get-features-status-by-name.output" />
+    <fail>
+      <condition>
+        <and>
+          <isset property="boolean.status" />
+          <equals arg1="uninstalled" arg2="${get-features-status-by-name.output}" trim="true" />
+        </and>
+      </condition>
+    </fail>
+    <echo message="Found status for ${features.name}: ${get-features-status-by-name.output}" />
     
   </target>
   
