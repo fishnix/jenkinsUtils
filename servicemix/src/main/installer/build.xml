@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="jenkins-servicemix">
+<project name="jenkins-servicemix" default="usage">
+  
+  <description>Tools to manipulate apache-servicemix.</description>
+  
   <defaultexcludes add="**/.svn"/>
   <defaultexcludes add="**/.svn/**"/>
   <defaultexcludes add="**/.git"/>
@@ -14,7 +17,7 @@
   <property name="karaf.remote.user" value="smx" />
   <property name="karaf.remote.pass" value="smx" />
   <property name="karaf.remote.cmd"  value="admin:list" />
-  
+   
   
   <!--
     Define a macro to sshexec against a karaf instance
@@ -47,6 +50,10 @@
                         karaf-remote-host="${karaf.remote.host}" karaf-remote-port="${karaf.remote.port}" />
   </target>
 
+
+  <!--
+    Checks that a child name is set.
+  -->
   <target name="check-child-name">
     <fail message="Please provide the chile.name." unless="child.name" />
   </target>
@@ -310,5 +317,44 @@
     
   </target>
   
+  <target name="usage">
+    <echo>
+          NOTE: All options should be specified as system properties 
+             on the command line, e.g.:
+
+             ant target-name -Doption1=value1 -Doption2=value2
+
+          Usage:
+            ant &lt;ant-task> &lt;options>
+
+          ------------------------------------------------------------
+
+          Targets: 
+                call-karaf-remote-exec - run a specific karaf command
+                create-child - create's a child instance
+                list-children - list child instances
+                get-ssh-port-by-name - get a child's ssh port by name
+                get-status-by-name - get the child's status by name
+                add-features-url - add a features url
+                list-features-url - list the features urls
+                refresh-features-urls - refresh all features urls
+                refresh-features-url - refresh one features url
+                install-features - install a feature
+                get-features-status-by-name - get status of a feature
+                
+          Modifiers:
+                boolean.status - changes the behavior of status
+                    targets to fail when a negative status is returned.
+                karaf.remote.host - set the host to connect to via ssh
+                karaf.remote.port - set the port to connect to via ssh
+                karaf.remote.user - set the user to connect with
+                karaf.remote.pass - set the password to connect with
+                
+         ------------------------------------------------------------
+
+                ant -help  - Display ant help screen
+                ant usage  - Display this message
+    </echo>
+  </target>
   
 </project>  
