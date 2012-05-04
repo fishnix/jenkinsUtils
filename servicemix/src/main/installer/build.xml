@@ -5,6 +5,7 @@
   <defaultexcludes add="**/.git"/>
   <defaultexcludes add="**/.git/**"/>
 
+
   <!--
     Set some sane defaults - all overridable.
   -->
@@ -13,6 +14,7 @@
   <property name="karaf.remote.user" value="smx" />
   <property name="karaf.remote.pass" value="smx" />
   <property name="karaf.remote.cmd"  value="admin:list" />
+  
   
   <!--
     Define a macro to sshexec against a karaf instance
@@ -35,6 +37,7 @@
     </sequential>
   </macrodef>
 
+
   <!--
     Generic task to make a call to karaf, you provide the command in karaf.remote.cmd
   -->
@@ -47,6 +50,7 @@
   <target name="check-child-name">
     <fail message="Please provide the chile.name." unless="child.name" />
   </target>
+
 
   <!--
     Create a child instance, you supply the name in create.child.name
@@ -90,6 +94,7 @@
     
   </target>
   
+  
   <!--
     Specific task to return the ssh port of an instance by name
   -->
@@ -114,6 +119,7 @@
     <echo message="Found ssh port for ${child.name}: ${get-child-ssh-port.output}" />
     
   </target>
+  
   
   <!--
     Specific task to return the status of an instance by name
@@ -151,20 +157,33 @@
     
   </target>
   
+  
   <!-- 
        =========================
        Start features management
        =========================
    -->
   
+  
+   <!--
+     Checks that a features.url is set.
+   -->
   <target name="check-features-url">
     <fail message="Features url not set." unless="features.url" />
   </target>
   
+  
+  <!--
+    Checks that a features.name is set.
+  -->
   <target name="check-features-name">
     <fail message="Features name not set." unless="features.name" />
   </target>
   
+  
+  <!--
+    Add a features URL
+  -->
   <target name="add-features-url" depends="check-features-url">
     
     <property name="add.features.url.remote.cmd" value="features:addurl ${features.url}" />
@@ -179,6 +198,10 @@
     
   </target>
   
+  
+  <!--
+    List all features URLs
+  -->
   <target name="list-features-url">
     
     <property name="list.features.url.remote.cmd" value="features:listurl" />
@@ -195,6 +218,9 @@
   </target>
   
   
+  <!--
+    Refreshes ALL features URLs.
+  -->
   <target name="refresh-features-urls">
     
     <property name="refresh.features.urls.remote.cmd" value="features:refreshUrl" />
@@ -209,6 +235,10 @@
     
   </target>
   
+  
+  <!--
+    Refreshes one features URL.  Requires features.url be set
+  -->
   <target name="refresh-features-url" depends="check-features-url">
     
     <property name="refresh.features.url.remote.cmd" value="features:refreshUrl ${features.url}" />
@@ -225,6 +255,10 @@
   </target>
   
   
+  <!--
+    Installs features.  Requires features.name which should have
+    been loaded previously by adding the features url.
+  -->
   <target name="install-features"  depends="check-features-name">
     
     <property name="install.features.remote.cmd" value="features:install ${features.name}" />
@@ -240,6 +274,7 @@
     <echo message="${install-features.output}" />
     
   </target>
+  
   
   <!--
     Specific task to return the status of a feature by name
