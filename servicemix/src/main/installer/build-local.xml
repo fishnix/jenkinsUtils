@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="jenkins-servicemix" default="usage">
+  
+  <description>
+    Tools to manipulate apache-servicemix locally.
+    Written because karaf remote exec is too limiting.
+  </description>
+  
+  <defaultexcludes add="**/.svn"/>
+  <defaultexcludes add="**/.svn/**"/>
+  <defaultexcludes add="**/.git"/>
+  <defaultexcludes add="**/.git/**"/>
+
+  <property environment="env"/>
+
+  <!--
+    Set some sane defaults - all overridable.
+  -->
+  <property name="karaf.home" value="/usr/local/apache-servicemix" />
+  <property name="karaf.instances" value="${karaf.home}/instances" />
+  
+
+  <echo>
+    JAVA_HOME: ${java.home}
+    KARAF_HOME: ${karaf.home}
+    PATH: ${env.PATH}
+  </echo>
+
+  <!--
+    Exec karaf admin command
+  -->
+  <macrodef name="karaf-exec">
+    <attribute name="karaf-command" />
+    <attribute name="karaf-exec-output" />
+    <sequential>
+      <exec  executable="${karaf.home}/bin/admin" output="@{karaf-exec-output}" >
+        <env key="JAVA_HOME"    value="${java.home}" />
+        <env key="KARAF_HOME"   value="${karaf.home}" />
+        <env key="PATH" path="${env.PATH}:${java.home}/bin"/>
+        <arg line="@{karaf-command}"/>
+      </exec>
+    </sequential>
+  </macrodef>
+
+  <!--
+    Checks that a child name is set.
+  -->
+  <target name="check-child-name">
+    <fail message="Please provide the chile.name." unless="child.name" />
+  </target>
+
+
+  <!--
+    List instances
+  -->
+  <target name="list-instances">
+    <property name="list-instances.cmd" value="list" />
+    
+    <tempfile property="list-instances.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-exec  karaf-command="${list-instances.cmd}" karaf-exec-output="${list-instances.tempfile}" />
+    <loadfile srcfile="${list-instances.tempfile}" property="list-instances.output" />
+
+    <fail message="Cound not list instances." unless="list-instances.output" />
+    <echo message="${list-instances.output}" />
+  </target>
+
+  <!--
+    Create an instance, you supply the name in child.name
+  -->
+  <target name="create-child" depends="check-child-name">
+    <property name="create-child.cmd" value="create ${child.name}" />
+        
+    <tempfile property="create-child.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-exec  karaf-command="${create-child.cmd}" karaf-exec-output="${create-child.tempfile}" />
+    <loadfile srcfile="${create-child.tempfile}" property="create-child.output" />
+
+    <fail message="Cound not create instances." unless="create-child.output" />
+    <echo message="${create-child.output}" />
+  </target>
+  
+  <!--
+    Start an instance, you supply the name in child.name
+  -->
+  <target name="start-child" depends="check-child-name">
+    <property name="start-child.cmd" value="start ${child.name}" />
+        
+    <tempfile property="start-child.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-exec  karaf-command="${start-child.cmd}" karaf-exec-output="${start-child.tempfile}" />
+    <loadfile srcfile="${start-child.tempfile}" property="start-child.output" />
+
+    <fail message="Cound not start instances." unless="start-child.output" />
+    <echo message="${start-child.output}" />
+  </target>
+  
+  <!--
+   Stop an instance, you supply the name in child.name
+  -->
+  <target name="stop-child" depends="check-child-name">
+    <property name="stop-child.cmd" value="stop ${child.name}" />
+        
+    <tempfile property="stop-child.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-exec  karaf-command="${stop-child.cmd}" karaf-exec-output="${stop-child.tempfile}" />
+    <loadfile srcfile="${stop-child.tempfile}" property="stop-child.output" />
+
+    <fail message="Cound not stop instances." unless="stop-child.output" />
+    <echo message="${stop-child.output}" />
+  </target>
+  
+  
+  <!--
+   Destroy an instance, you supply the name in child.name
+  -->
+  <target name="destroy-child" depends="check-child-name">
+    <property name="destroy-child.cmd" value="destroy ${child.name}" />
+        
+    <tempfile property="destroy-child.tempfile" deleteonexit="true" createfile="true" />
+    <karaf-exec  karaf-command="${destroy-child.cmd}" karaf-exec-output="${destroy-child.tempfile}" />
+    <loadfile srcfile="${destroy-child.tempfile}" property="destroy-child.output" />
+
+    <fail message="Cound not destroy instances." unless="destroy-child.output" />
+    <echo message="${destroy-child.output}" />
+  </target>
+  
+  <target name="config-mvn-repos">
+    <echo>Copying ${build.resources}/org.ops4j.pax.url.mvn.cfg to ${karaf.instances}/${child.name}/etc</echo>
+    <copy file="${build.resources}/org.ops4j.pax.url.mvn.cfg"
+          todir="${karaf.instances}/${child.name}/etc"
+          overwrite="true" />
+  </target>
+  
+  <!--
+    Config child instance
+  -->
+  <target name="config-child" depends="check-child-name,config-mvn-repos" />
+
+  <target name="usage">
+    <echo>
+      Usage:
+    </echo>
+  </target>
+
+</project>

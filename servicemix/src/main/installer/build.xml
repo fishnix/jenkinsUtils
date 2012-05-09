@@ -7,8 +7,7 @@
   <defaultexcludes add="**/.svn/**"/>
   <defaultexcludes add="**/.git"/>
   <defaultexcludes add="**/.git/**"/>
-
-
+  
   <!--
     Set some sane defaults - all overridable.
   -->
